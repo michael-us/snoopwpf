@@ -194,7 +194,7 @@ namespace Snoop
 			{
 				Visual presentationSourceRootVisual = presentationSource.RootVisual;
 
-                if (!(presentationSourceRootVisual is Window))
+                if (!(presentationSourceRootVisual is Window) && presentationSourceRootVisual.GetType().Name != "PopupRoot")
 					continue;
 
 				Dispatcher presentationSourceRootVisualDispatcher = presentationSourceRootVisual.Dispatcher;
