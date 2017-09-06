@@ -149,6 +149,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Xaml\XamlView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="ZoomerControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -256,6 +260,12 @@
     <Compile Include="Shell\SnoopPSHostRawUserInterface.cs" />
     <Compile Include="Shell\SnoopPSHostUserInterface.cs" />
     <Compile Include="Shell\VisualTreeProvider.cs" />
+    <Compile Include="Xaml\PropertyXaml.cs" />
+    <Compile Include="Xaml\XamlView.xaml.cs">
+      <DependentUpon>XamlView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Xaml\XamlFormatter.cs" />
+    <Compile Include="Xaml\XamlStyles.cs" />
     <Compile Include="ZoomerControl.xaml.cs">
       <DependentUpon>ZoomerControl.xaml</DependentUpon>
     </Compile>

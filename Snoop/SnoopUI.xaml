@@ -16,6 +16,7 @@ All other rights reserved.
 	xmlns:conv="clr-namespace:Snoop.Converters"
 	xmlns:MethodsTabNS="clr-namespace:Snoop.MethodsTab"
     xmlns:DebugListenerNS="clr-namespace:Snoop.DebugListenerTab"
+	xmlns:xaml="clr-namespace:Snoop.Xaml"
 	mc:Ignorable="d"
 	Icon="Snoop.ico"
 	Title="Snoop"
@@ -303,6 +304,24 @@ All other rights reserved.
 					RootTarget="{Binding CurrentSelection.Target}"
 					IsSelected="{Binding IsSelected, RelativeSource={RelativeSource AncestorType={x:Type TabItem}}}"
 				/>
+			</TabItem>
+
+			<TabItem>
+				<TabItem.Header>
+					<TextBlock Style="{x:Null}" Text="Xaml">
+						<TextBlock.ToolTip>
+							<StackPanel MaxWidth="300">
+								<TextBlock Style="{x:Null}" Text="Xaml View"/>
+								<TextBlock
+									Style="{x:Null}"
+									Text="A rudimentary view that shows xaml properties of the selected visual."
+									TextWrapping="Wrap"
+								/>
+							</StackPanel>
+						</TextBlock.ToolTip>
+					</TextBlock>
+				</TabItem.Header>
+				<xaml:XamlView Target="{Binding CurrentSelection.Target}" />
 			</TabItem>
 
 			<TabItem
