@@ -78,14 +78,14 @@ namespace Snoop.Xaml
                         if (reader.NodeType == XmlNodeType.Text)
                         {
                             var content = reader.ReadContentAsString();
-                            if (content.IndexOfAny(new[] { '\r', '\n' }) >= 0)
+                            if (content.IndexOfAny(new[] { '\r', '\n' }) >= 0 && indent > 0)
                             {
                                 // indentation
                                 paragraph.AddRun(new string(' ', indent * 4), styles.TextStyle);
                             }
                             paragraph.AddRun(content, styles.TextStyle);
                         }
-                        else
+                        else if (indent > 0)
                         {
                             // indentation
                             paragraph.AddRun(new string(' ', indent * 4), styles.TextStyle);
