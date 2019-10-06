@@ -12,11 +12,14 @@ All other rights reserved.
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	mc:Ignorable="d"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:infrastructure="clr-namespace:Snoop.Infrastructure"
+	xmlns:converters="clr-namespace:Snoop.Converters"
 	x:Class="Snoop.AppChooser"
 	Icon="Snoop.ico"
 	Title="Snoop"
 	SizeToContent="Width"
 	Height="26"
+    MinHeight="26"
 	ResizeMode="NoResize"
 	MouseLeftButtonDown="HandleMouseLeftButtonDown"
 	SnapsToDevicePixels="False"
@@ -188,6 +191,7 @@ All other rights reserved.
 			<ColumnDefinition Width="Auto"/>
 			<ColumnDefinition Width="Auto"/>
 			<ColumnDefinition Width="Auto"/>
+		    <ColumnDefinition Width="Auto"/>
 		</Grid.ColumnDefinitions>
 
 		<!-- semi-transparent black background (is this needed?) -->
@@ -240,8 +244,30 @@ All other rights reserved.
 			IsSynchronizedWithCurrentItem="True"
 			FontSize="10.667"
 			FocusVisualStyle="{DynamicResource simpleComboBoxFocusStyle}"
-			ToolTip="This combo box shows the list of applications that can be Snoop(ed)."
-		/>
+			ToolTip="This combo box shows the list of applications that can be Snoop(ed).">
+            <ComboBox.ItemTemplate>
+                <DataTemplate DataType="my:WindowInfo">
+                    <Grid Style="{x:Null}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Border Grid.Column="0"
+                                Style="{x:Null}"
+                                Width="16"
+                                Height="16">
+                            <Image Style="{x:Null}"
+                                   Visibility="{Binding IsOwningProcessElevated, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                   Source="{Binding Source={x:Static infrastructure:SystemIcon.Shield}, Converter={x:Static converters:SystemIconToImageSourceConverter.Instance}, ConverterParameter=16}" />
+                        </Border>
+
+                        <TextBlock Grid.Column="1" 
+                                   Style="{x:Null}"
+                                   Text="{Binding}" />
+                    </Grid>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+		</ComboBox>
 
 		<!-- refresh button -->
 		<Button
@@ -558,10 +584,21 @@ All other rights reserved.
 			<my:WindowFinder Margin="2,0,0,0" WindowFinderType="Snoop" ToolTip="Drag and drop this crosshairs over a WPF window in order to Snoop it."/>
 		</StackPanel>
 
+        <Button Grid.Column="4" 
+                Style="{StaticResource appChooserButtonStyle}" 
+                Width="20"
+                Height="20"
+                Margin="0,0,8,0"
+                ToolTip="Change Snoop settings."
+                Command="{x:Static my:AppChooser.SettingsCommand}">
+            <Image Style="{x:Null}"
+                   Source="{Binding Source={x:Static infrastructure:SystemIcon.Settings}, Converter={x:Static converters:SystemIconToImageSourceConverter.Instance}, ConverterParameter=16}" />
+        </Button>
+
 		<!-- minimizeButton -->
 		<Button
 			x:Name="minimizeButton"
-			Grid.Column="4"
+			Grid.Column="5"
 			Width="20"
 			Height="20"
 			Style="{DynamicResource appChooserMinimizeCloseButtonStyle}"
@@ -583,7 +620,7 @@ All other rights reserved.
 		<!-- closeButton -->
 		<Button
 			x:Name="closeButton"
-			Grid.Column="5"
+			Grid.Column="6"
 			Width="20"
 			Height="20"
 			Margin="2,0,4,0"

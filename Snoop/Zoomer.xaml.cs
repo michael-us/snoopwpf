@@ -21,7 +21,9 @@ using Snoop.Infrastructure;
 
 namespace Snoop
 {
-	public partial class Zoomer
+    using Snoop.Data;
+
+    public partial class Zoomer
 	{
 		static Zoomer()
 		{
@@ -48,6 +50,7 @@ namespace Snoop
 			Zoomer.SwitchTo2DCommand.InputGestures.Add(new KeyGesture(Key.F2));
 			Zoomer.SwitchTo3DCommand.InputGestures.Add(new KeyGesture(Key.F3));
 		}
+
 		public Zoomer()
 		{
 			this.CommandBindings.Add(new CommandBinding(Zoomer.ResetCommand, this.HandleReset, this.CanReset));
@@ -60,8 +63,6 @@ namespace Snoop
 			this.CommandBindings.Add(new CommandBinding(Zoomer.SwitchTo2DCommand, this.HandleSwitchTo2D));
 			this.CommandBindings.Add(new CommandBinding(Zoomer.SwitchTo3DCommand, this.HandleSwitchTo3D, this.CanSwitchTo3D));
 
-			this.InheritanceBehavior = InheritanceBehavior.SkipToThemeNext;
-
 			this.InitializeComponent();
 
 			this.transform.Children.Add(this.zoom);
@@ -70,22 +71,28 @@ namespace Snoop
 			this.Viewbox.RenderTransform = this.transform;
 		}
 
-		public static void GoBabyGo()
+		public static void GoBabyGo(string settingsFile)
 		{
-			Dispatcher dispatcher;
-			if (Application.Current == null && !SnoopModes.MultipleDispatcherMode)
-				dispatcher = Dispatcher.CurrentDispatcher;
-			else
-				dispatcher = Application.Current.Dispatcher;
+            TransientSettingsData.LoadCurrentIfRequired(settingsFile);
 
-			if (dispatcher.CheckAccess())
+            Dispatcher dispatcher;
+            if (Application.Current == null)
+            {
+                dispatcher = Dispatcher.CurrentDispatcher;
+            }
+            else
+            {
+                dispatcher = Application.Current.Dispatcher;
+            }
+
+            if (dispatcher.CheckAccess())
 			{
-				Zoomer zoomer = new Zoomer();
+				var zoomer = new Zoomer();
 				zoomer.Magnify();
 			}
 			else
 			{
-				dispatcher.Invoke((Action)GoBabyGo);
+				dispatcher.Invoke((Action)(() => GoBabyGo(settingsFile)));
 			}
 		}
 
@@ -96,7 +103,7 @@ namespace Snoop
 			{
 				MessageBox.Show
 				(
-					"Can't find a current application or a PresentationSource root visual!",
+					"Can't find a current application or a PresentationSource root visual.",
 					"Can't Magnify",
 					MessageBoxButton.OK,
 					MessageBoxImage.Exclamation
@@ -110,9 +117,7 @@ namespace Snoop
 		{
 			this.Target = root;
 
-			Window ownerWindow = SnoopWindowUtils.FindOwnerWindow();
-			if (ownerWindow != null)
-				this.Owner = ownerWindow;
+		    this.Owner = SnoopWindowUtils.FindOwnerWindow(this);
 
 			SnoopPartsRegistry.AddSnoopVisualTreeRoot(this);
 
@@ -146,22 +151,9 @@ namespace Snoop
 		{
 			base.OnSourceInitialized(e);
 
-			try
-			{
-				// load the window placement details from the user settings.
-				WINDOWPLACEMENT wp = (WINDOWPLACEMENT)Properties.Settings.Default.ZoomerWindowPlacement;
-				wp.length = Marshal.SizeOf(typeof(WINDOWPLACEMENT));
-				wp.flags = 0;
-				wp.showCmd = (wp.showCmd == Win32.SW_SHOWMINIMIZED ? Win32.SW_SHOWNORMAL : wp.showCmd);
-				IntPtr hwnd = new WindowInteropHelper(this).Handle;
-				Win32.SetWindowPlacement(hwnd, ref wp);
-			}
-			catch
-			{
-			}
-		}
-
-		
+		    // load the window placement details from the user settings.
+		    SnoopWindowUtils.LoadWindowPlacement(this, Properties.Settings.Default.ZoomerWindowPlacement);
+		}		
 
 		protected override void OnClosing(CancelEventArgs e)
 		{
@@ -169,12 +161,8 @@ namespace Snoop
 
 			this.Viewbox.Child = null;
 
-			// persist the window placement details to the user settings.
-			WINDOWPLACEMENT wp = new WINDOWPLACEMENT();
-			IntPtr hwnd = new WindowInteropHelper(this).Handle;
-			Win32.GetWindowPlacement(hwnd, out wp);
-			Properties.Settings.Default.ZoomerWindowPlacement = wp;
-			Properties.Settings.Default.Save();
+		    // persist the window placement details to the user settings.
+		    SnoopWindowUtils.SaveWindowPlacement(this, wp => Properties.Settings.Default.ZoomerWindowPlacement = wp);
 
 			SnoopPartsRegistry.RemoveSnoopVisualTreeRoot(this);
 		}
@@ -439,67 +427,6 @@ namespace Snoop
 
 			return root;
 		}
-		private void SetOwnerWindow()
-		{
-			Window ownerWindow = null;
-
-			if (SnoopModes.MultipleDispatcherMode)
-			{
-				foreach (PresentationSource presentationSource in PresentationSource.CurrentSources)
-				{
-					if
-					(
-						presentationSource.RootVisual is Window &&
-						((Window)presentationSource.RootVisual).Dispatcher.CheckAccess()
-					)
-					{
-						ownerWindow = (Window)presentationSource.RootVisual;
-						break;
-					}
-				}
-			}
-			else if (Application.Current != null)
-			{
-				if (Application.Current.MainWindow != null && Application.Current.MainWindow.Visibility == Visibility.Visible)
-				{
-					// first: set the owner window as the current application's main window, if visible.
-					ownerWindow = Application.Current.MainWindow;
-				}
-				else
-				{
-					// second: try and find a visible window in the list of the current application's windows
-					foreach (Window window in Application.Current.Windows)
-					{
-						if (window.Visibility == Visibility.Visible)
-						{
-							ownerWindow = window;
-							break;
-						}
-					}
-				}
-			}
-
-			if (ownerWindow == null)
-			{
-				// third: try and find a visible window in the list of current presentation sources
-				foreach (PresentationSource presentationSource in PresentationSource.CurrentSources)
-				{
-					if
-					(
-						presentationSource.RootVisual is Window &&
-						((Window)presentationSource.RootVisual).Visibility == Visibility.Visible
-					)
-					{
-						ownerWindow = (Window)presentationSource.RootVisual;
-						break;
-					}
-				}
-			}
-
-			if (ownerWindow != null)
-				this.Owner = ownerWindow;
-		}
-
 
 		private TranslateTransform translation = new TranslateTransform();
 		private ScaleTransform zoom = new ScaleTransform();

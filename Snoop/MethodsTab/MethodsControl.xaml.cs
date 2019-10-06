@@ -221,9 +221,9 @@ namespace Snoop.MethodsTab
                 }
                 return true;
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
-                MessageBox.Show(ex.Message, "Error creating parameter");
+                ErrorDialog.ShowDialog(exception, "Error creating parameter", exceptionAlreadyHandled: true);
                 return false;
             }
         }
@@ -260,10 +260,9 @@ namespace Snoop.MethodsTab
                     this.propertyInspector.RootTarget = returnValue;
                 }
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
-                string message = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
-                MessageBox.Show(message, "Error invoking method");
+                ErrorDialog.ShowDialog(exception, $"Error invoking method '{selectedMethod.MethodName}'", exceptionAlreadyHandled: true);
             }
         }
 
@@ -317,8 +316,8 @@ namespace Snoop.MethodsTab
             paramCreator.TextBlockDescription.Text = "Delve into the new desired target by double-clicking on the property. Clicking OK will select the currently delved property to be the new target.";
             paramCreator.Title = "Change Target";
             paramCreator.RootTarget = this.RootTarget;
-            paramCreator.WindowStartupLocation = WindowStartupLocation.CenterScreen;
-            paramCreator.ShowDialog();
+            
+            paramCreator.ShowDialogEx(this);
 
             if (paramCreator.DialogResult.HasValue && paramCreator.DialogResult.Value)
             {

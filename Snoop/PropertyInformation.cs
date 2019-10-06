@@ -21,18 +21,20 @@ using System.Linq;
 
 namespace Snoop
 {
-	public class PropertyInformation : DependencyObject, IComparable, INotifyPropertyChanged
+    using Snoop.Converters;
+
+    public class PropertyInformation : DependencyObject, IComparable, INotifyPropertyChanged
 	{
 		/// <summary>
 		/// Normal constructor used when constructing PropertyInformation objects for properties.
 		/// </summary>
 		/// <param name="target">target object being shown in the property grid</param>
-		/// <param name="property">the property around which we are contructing this PropertyInformation object</param>
+		/// <param name="property">the property around which we are constructing this PropertyInformation object</param>
 		/// <param name="propertyName">the property name for the property that we use in the binding in the case of a non-dependency property</param>
 		/// <param name="propertyDisplayName">the display name for the property that goes in the name column</param>
 		public PropertyInformation(object target, PropertyDescriptor property, string propertyName, string propertyDisplayName)
 		{
-			this.target = target;
+			this.Target = target;
 			this.property = property;
 			this.displayName = propertyDisplayName;
 
@@ -72,7 +74,36 @@ namespace Snoop
 			this.isRunning = true;
 		}
 
-		/// <summary>
+        /// <summary>
+        /// Normal constructor used when constructing PropertyInformation objects for properties.
+        /// </summary>
+        /// <param name="target">target object being shown in the property grid</param>
+        /// <param name="property">the property around which we are constructing this PropertyInformation object</param>
+        /// <param name="binding">the <see cref="BindingBase"/> from which the value should be retrieved</param>
+        /// <param name="propertyDisplayName">the display name for the property that goes in the name column</param>
+        public PropertyInformation(object target, PropertyDescriptor property, BindingBase binding, string propertyDisplayName)
+	    {
+	        this.Target = target;
+	        this.property = property;
+	        this.displayName = propertyDisplayName;
+
+	        try
+	        {
+	            BindingOperations.SetBinding(this, PropertyInformation.ValueProperty, binding);
+	        }
+	        catch (Exception)
+	        {
+	            // cplotts note:
+	            // warning: i saw a problem get swallowed by this empty catch (Exception) block.
+	            // in other words, this empty catch block could be hiding some potential future errors.
+	        }
+
+	        this.Update();
+
+	        this.isRunning = true;
+	    }	    
+
+	    /// <summary>
 		/// Constructor used when constructing PropertyInformation objects for an item in a collection.
 		/// In this case, we set the PropertyDescriptor for this object (in the property Property) to be null.
 		/// This kind of makes since because an item in a collection really isn't a property on a class.
@@ -95,30 +126,29 @@ namespace Snoop
 			BindingOperations.ClearAllBindings(this);
 		}
 
-		public object Target
-		{
-			get { return this.target; }
-		}
-		private object target;
+        public object Target { get; }
 
-		public object Value
+	    public object Value
 		{
 			get { return this.GetValue(PropertyInformation.ValueProperty); }
 			set { this.SetValue(PropertyInformation.ValueProperty, value); }
 		}
+
 		public static readonly DependencyProperty ValueProperty =
 			DependencyProperty.Register
 			(
-				"Value",
+				nameof(Value),
 				typeof(object),
 				typeof(PropertyInformation),
 				new PropertyMetadata(new PropertyChangedCallback(PropertyInformation.HandleValueChanged))
 			);
-		private static void HandleValueChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+		
+	    private static void HandleValueChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
 		{
-			((PropertyInformation)d).OnValueChanged();
+			((PropertyInformation)d).OnValueChanged(e);
 		}
-		protected virtual void OnValueChanged()
+
+		protected virtual void OnValueChanged(DependencyPropertyChangedEventArgs e)
 		{
 			this.Update();
 
@@ -126,17 +156,23 @@ namespace Snoop
 			{
 				if (this.breakOnChange)
 				{
-					if (!Debugger.IsAttached)
-						Debugger.Launch();
-					Debugger.Break();
+					if (Debugger.IsAttached == false)
+                    {
+                        Debugger.Launch();
+                    }
+
+                    Debugger.Break();
 				}
 
-				this.HasChangedRecently = true;
+				this.HasChangedRecently = (e.OldValue?.Equals(e.NewValue) ?? e.OldValue == e.NewValue) == false;
+
 				if (this.changeTimer == null)
 				{
-					this.changeTimer = new DispatcherTimer();
-					this.changeTimer.Interval = TimeSpan.FromSeconds(1.5);
-					this.changeTimer.Tick += this.HandleChangeExpiry;
+				    this.changeTimer = new DispatcherTimer
+				                       {
+				                           Interval = TimeSpan.FromSeconds(1.5)
+				                       };
+				    this.changeTimer.Tick += this.HandleChangeExpiry;
 					this.changeTimer.Start();
 				}
 				else
@@ -146,6 +182,7 @@ namespace Snoop
 				}
 			}
 		}
+
 		private void HandleChangeExpiry(object sender, EventArgs e)
 		{
 			this.changeTimer.Stop();
@@ -153,6 +190,7 @@ namespace Snoop
 
 			this.HasChangedRecently = false;
 		}
+
 		private DispatcherTimer changeTimer;
 
 		public string StringValue
@@ -176,7 +214,7 @@ namespace Snoop
 				Type targetType = this.property.PropertyType;
 				if (targetType.IsAssignableFrom(typeof(string)))
 				{
-					this.property.SetValue(this.target, value);
+					this.property.SetValue(this.Target, value);
 				}
 				else
 				{
@@ -185,7 +223,7 @@ namespace Snoop
 					{
 						try
 						{
-							this.property.SetValue(this.target, converter.ConvertFrom(value));
+							this.property.SetValue(this.Target, converter.ConvertFrom(value));
 						}
 						catch (Exception)
 						{
@@ -212,7 +250,15 @@ namespace Snoop
 					// Add brackets around types to distinguish them from values.
 					// Replace long type names with short type names for some specific types, for easier readability.
 					// FUTURE: This could be extended to other types.
-					if (this.property != null &&
+				    if (value is BindingBase)
+				    {
+				        stringValue = string.Format("[{0}]", "Binding");
+				    }
+				    else if (value is DynamicResourceExtension)
+				    {
+				        stringValue = string.Format("[{0}]", "DynamicResource");
+				    }
+					else if (this.property != null &&
 						(this.property.PropertyType == typeof(Brush) || this.property.PropertyType == typeof(Style)))
 					{
 						stringValue = string.Format("[{0}]", value.GetType().Name);
@@ -231,26 +277,27 @@ namespace Snoop
 					stringValue = "Transparent";
 				}
 
-				DependencyObject dependencyObject = this.Target as DependencyObject;
-				if (dependencyObject != null && this.DependencyProperty != null)
+			    if (this.Target is DependencyObject dependencyObject)
 				{
 					// Cache the resource key for this item if not cached already. This could be done for more types, but would need to optimize perf.
 					string resourceKey = null;
-					if (this.property != null &&
-						(this.property.PropertyType == typeof(Style) || this.property.PropertyType == typeof(Brush)))
+					if (this.property != null 
+					    && (this.property.PropertyType == typeof(Style) || this.property.PropertyType == typeof(Brush)))
 					{
-						object resourceItem = dependencyObject.GetValue(this.DependencyProperty);
+						var resourceItem = value;
 						resourceKey = ResourceKeyCache.GetKey(resourceItem);
+
 						if (string.IsNullOrEmpty(resourceKey))
 						{
-							resourceKey = ResourceDictionaryKeyHelpers.GetKeyOfResourceItem(dependencyObject, this.DependencyProperty);
+							resourceKey = ResourceDictionaryKeyHelpers.GetKeyOfResourceItem(dependencyObject, resourceItem);
 							ResourceKeyCache.Cache(resourceItem, resourceKey);
 						}
+
 						Debug.Assert(resourceKey != null);
 					}
 
 					// Display both the value and the resource key, if there's a key for this property.
-					if (!string.IsNullOrEmpty(resourceKey))
+					if (string.IsNullOrEmpty(resourceKey) == false)
 					{
 						return string.Format("{0} {1}", resourceKey, stringValue);
 					}
@@ -465,7 +512,7 @@ namespace Snoop
 			get
 			{
 				DependencyProperty dp = this.DependencyProperty;
-				DependencyObject d = this.target as DependencyObject;
+				DependencyObject d = this.Target as DependencyObject;
 				if (dp != null && d != null)
 					return BindingOperations.GetBindingBase(d, dp);
 				return null;
@@ -477,7 +524,7 @@ namespace Snoop
 			get
 			{
 				DependencyProperty dp = this.DependencyProperty;
-				DependencyObject d = this.target as DependencyObject;
+				DependencyObject d = this.Target as DependencyObject;
 				if (dp != null && d != null)
 					return BindingOperations.GetBindingExpressionBase(d, dp);
 				return null;
@@ -532,9 +579,9 @@ namespace Snoop
 		public void Clear()
 		{
 			DependencyProperty dp = this.DependencyProperty;
-			DependencyObject d = this.target as DependencyObject;
+			DependencyObject d = this.Target as DependencyObject;
 			if (dp != null && d != null)
-				((DependencyObject)this.target).ClearValue(dp);
+				((DependencyObject)this.Target).ClearValue(dp);
 		}
 
 		/// <summary>
@@ -569,7 +616,7 @@ namespace Snoop
 			this.isDatabound = false;
 
 			DependencyProperty dp = this.DependencyProperty;
-			DependencyObject d = target as DependencyObject;
+			DependencyObject d = this.Target as DependencyObject;
 
 			if (SnoopModes.MultipleDispatcherMode && d != null && d.Dispatcher != this.Dispatcher)
 				return;

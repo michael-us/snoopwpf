@@ -10,6 +10,8 @@ using System.Windows;
 
 namespace Snoop
 {
+	using System.Windows.Interop;
+
 	class VisualCaptureUtil
 	{
 		public static void SaveVisual(Visual visual, int dpi, string filename)
@@ -19,7 +21,7 @@ namespace Snoop
 			// where he wraps the Visual inside of a VisualBrush and then renders it.
 			// http://blogs.msdn.com/b/jaimer/archive/2009/07/03/rendertargetbitmap-tips.aspx
 
-			if (visual == null)
+			if (visual == null || !IsSafeToVisualize(visual))
 				return;
 
 			Rect bounds;
@@ -33,26 +35,43 @@ namespace Snoop
 				bounds = VisualTreeHelper.GetDescendantBounds(visual);
 			}
 
-			double sizeFactor = dpi / BaseDpi;
+			var scale = dpi / BaseDpi;
+            var finalImageSize = new Size((int)(bounds.Width * scale), (int)(bounds.Height * scale));
+
 			RenderTargetBitmap rtb =
 				new RenderTargetBitmap
 				(
-					(int)(bounds.Width * sizeFactor),
-					(int)(bounds.Height * sizeFactor),
+                    (int)finalImageSize.Width,
+                    (int)finalImageSize.Height,
 					dpi,
 					dpi,
 					PixelFormats.Pbgra32
 				);
 
-			DrawingVisual dv = new DrawingVisual();
-			using (DrawingContext ctx = dv.RenderOpen())
-			{
-				VisualBrush vb = new VisualBrush(visual);
-				ctx.DrawRectangle(vb, null, new Rect(new Point(), bounds.Size));
-			}
-			rtb.Render(dv);
+            DrawingVisual dv = new DrawingVisual();
+            using (DrawingContext ctx = dv.RenderOpen())
+            {
+                VisualBrush vb = new VisualBrush(visual);
+                ctx.DrawRectangle(vb, null, new Rect(new Point(), bounds.Size));
+            }
+            rtb.Render(dv);
 
-			SaveRTBAsPNG(rtb, filename);
+            SaveRTBAsPNG(rtb, filename);
+		}
+
+		public static VisualBrush CreateVisualBrushSafe(Visual visual)
+		{
+			return IsSafeToVisualize(visual) ? new VisualBrush(visual) : null;
+		}
+
+		public static bool IsSafeToVisualize(Visual visual)
+		{
+			if (visual is Window window) {
+				var source = PresentationSource.FromVisual(visual) as HwndSource;
+				return source?.CompositionTarget != null;
+			}
+
+			return true;
 		}
 
 		private static void SaveRTBAsPNG(RenderTargetBitmap bitmap, string filename)

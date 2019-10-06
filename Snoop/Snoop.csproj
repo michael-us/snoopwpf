@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -11,41 +11,13 @@
     <RootNamespace>Snoop</RootNamespace>
     <AssemblyName>Snoop</AssemblyName>
     <BaseIntermediateOutputPath>$(SolutionDir)\Intermediate\Snoop\$(ConfigurationName)</BaseIntermediateOutputPath>
-    <ApplicationIcon>Snoop.ico</ApplicationIcon>
+    <ApplicationIcon>..\Artwork\Snoop.ico</ApplicationIcon>
     <SignAssembly>false</SignAssembly>
     <AssemblyOriginatorKeyFile>
     </AssemblyOriginatorKeyFile>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <FileUpgradeFlags>
-    </FileUpgradeFlags>
-    <OldToolsVersion>3.5</OldToolsVersion>
-    <UpgradeBackupLocation>
-    </UpgradeBackupLocation>
-    <SccProjectName>
-    </SccProjectName>
-    <SccLocalPath>
-    </SccLocalPath>
-    <SccAuxPath>
-    </SccAuxPath>
-    <SccProvider>
-    </SccProvider>
-    <PublishUrl>publish\</PublishUrl>
-    <Install>true</Install>
-    <InstallFrom>Disk</InstallFrom>
-    <UpdateEnabled>false</UpdateEnabled>
-    <UpdateMode>Foreground</UpdateMode>
-    <UpdateInterval>7</UpdateInterval>
-    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
-    <UpdatePeriodically>false</UpdatePeriodically>
-    <UpdateRequired>false</UpdateRequired>
-    <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
-    <UseApplicationTrust>false</UseApplicationTrust>
-    <BootstrapperEnabled>true</BootstrapperEnabled>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -69,36 +41,19 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="PresentationCore, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\Program Files\Reference Assemblies\Microsoft\WinFX\v3.0\PresentationCore.dll</HintPath>
-      <RequiredTargetFramework>3.0</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="PresentationFramework, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\Program Files\Reference Assemblies\Microsoft\WinFX\v3.0\PresentationFramework.dll</HintPath>
-      <RequiredTargetFramework>3.0</RequiredTargetFramework>
-    </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
-    <Reference Include="System.configuration" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Management.Automation, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\..\Windows\assembly\GAC_MSIL\System.Management.Automation\1.0.0.0__31bf3856ad364e35\System.Management.Automation.dll</HintPath>
-      <SpecificVersion>False</SpecificVersion>
-    </Reference>
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xaml" />
     <Reference Include="System.Xml" />
-    <Reference Include="UIAutomationProvider">
-      <RequiredTargetFramework>3.0</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="WindowsBase, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\Program Files\Reference Assemblies\Microsoft\WinFX\v3.0\WindowsBase.dll</HintPath>
-      <RequiredTargetFramework>3.0</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="WindowsFormsIntegration">
-      <RequiredTargetFramework>3.0</RequiredTargetFramework>
-    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="UIAutomationProvider" />
+    <Reference Include="WindowsBase" />
+    <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="DebugListenerTab\DebugListenerControl.xaml">
@@ -150,6 +105,15 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Xaml\XamlView.xaml">
+    <Page Include="TriggersTab\TriggersView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\SettingsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="WindowInfoControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -159,13 +123,9 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Snoop.ico" />
+    <Resource Include="..\Artwork\Snoop.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="SnoopabilityFeedbackWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="ValueEditors\EditorTemplates.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -173,26 +133,35 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="paket.references" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <Resource Include="Resources\active.png" />
+    <Resource Include="Resources\inactive.png" />
+    <Resource Include="Resources\triggeritem.png" />
+    <Resource Include="Resources\Warning.png" />
     <Content Include="Scripts\Snoop.psm1">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <None Include="VisualTreeItem.cd" />
   </ItemGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Compile Include="AdornerContainer.cs" />
     <Compile Include="ApplicationTreeItem.cs" />
+    <Compile Include="BindingDisplayHelper.cs" />
     <Compile Include="BringIntoViewBehavior.cs" />
     <Compile Include="Converters\ArgbToPartsConverter.cs" />
+    <Compile Include="Converters\BoolToVisibilityConverter.cs" />
+    <Compile Include="Converters\DynamicResourceToValueConverter.cs" />
     <Compile Include="Converters\FilterTypeToIntConverter.cs" />
     <Compile Include="Converters\IsPowerShellInstalledToVisibilityConverter.cs" />
     <Compile Include="Converters\CsvStringToArrayConverter.cs" />
     <Compile Include="Converters\IsSupportedRuntimeTypeConverter.cs" />
     <Compile Include="Converters\SnoopParameterInfoConverter.cs" />
+    <Compile Include="Converters\SystemIconToImageSourceConverter.cs" />
+    <Compile Include="Data\TransientSettingsData.cs" />
     <Compile Include="DebugListenerTab\DebugListenerControl.xaml.cs">
       <DependentUpon>DebugListenerControl.xaml</DependentUpon>
     </Compile>
@@ -216,8 +185,12 @@
     </Compile>
     <Compile Include="EventsListener.cs" />
     <Compile Include="EventTracker.cs" />
+    <Compile Include="Infrastructure\CrossAppDomainSnoop.cs" />
+    <Compile Include="Infrastructure\AttachedPropertyManager.cs" />
+    <Compile Include="Infrastructure\ClipboardHelper.cs" />
     <Compile Include="Infrastructure\ComboBoxSettings.cs" />
     <Compile Include="Infrastructure\ExtensionMethods.cs" />
+    <Compile Include="Infrastructure\LowLevelMouseHook.cs" />
     <Compile Include="Infrastructure\ISkipDelve.cs" />
     <Compile Include="Infrastructure\ObservableCollectionExtensions.cs" />
     <Compile Include="Infrastructure\RelayCommand.cs" />
@@ -225,7 +198,10 @@
     <Compile Include="Infrastructure\SnoopModes.cs" />
     <Compile Include="Infrastructure\SnoopPartsRegistry.cs" />
     <Compile Include="Infrastructure\ResourceKeyCache.cs" />
+    <Compile Include="Infrastructure\SystemIconHelper.cs" />
+    <Compile Include="Infrastructure\TemplateHelper.cs" />
     <Compile Include="Infrastructure\WhenLoaded.cs" />
+    <Compile Include="Infrastructure\WindowExtensions.cs" />
     <Compile Include="Infrastructure\ZoomerUtilities.cs" />
     <Compile Include="Injector.cs" />
     <Compile Include="Inspector.cs" />
@@ -248,10 +224,36 @@
     <Compile Include="MethodsTab\TypeSelector.xaml.cs">
       <DependentUpon>TypeSelector.xaml</DependentUpon>
     </Compile>
+    <Compile Include="mscoree\CorRuntimeHost.cs" />
+    <Compile Include="mscoree\CorRuntimeHostClass.cs" />
+    <Compile Include="mscoree\ICorConfiguration.cs" />
+    <Compile Include="mscoree\ICorRuntimeHost.cs" />
+    <Compile Include="mscoree\IDebuggerInfo.cs" />
+    <Compile Include="mscoree\IDebuggerThreadControl.cs" />
+    <Compile Include="mscoree\IGCHost.cs" />
+    <Compile Include="mscoree\IGCHostControl.cs" />
+    <Compile Include="mscoree\IGCThreadControl.cs" />
+    <Compile Include="mscoree\IValidator.cs" />
+    <Compile Include="mscoree\IVEHandler.cs" />
+    <Compile Include="mscoree\tag_VerError.cs" />
+    <Compile Include="mscoree\_COR_GC_STATS.cs" />
+    <Compile Include="mscoree\_COR_GC_THREAD_STATS.cs" />
     <Compile Include="NativeMethods.cs" />
     <Compile Include="ObjectToStringConverter.cs" />
     <Compile Include="PertinentPropertyFilter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Converters\BrushStopsConverter.cs" />
+    <Compile Include="TriggersTab\Triggers\ConditionItem.cs" />
+    <Compile Include="TriggersTab\Triggers\DataTriggerItem.cs" />
+    <Compile Include="TriggersTab\Triggers\EventTriggerItem.cs" />
+    <Compile Include="TriggersTab\Triggers\MultiDataTriggerItem.cs" />
+    <Compile Include="TriggersTab\Triggers\MultiTriggerItem.cs" />
+    <Compile Include="TriggersTab\Triggers\SetterItem.cs" />
+    <Compile Include="TriggersTab\Triggers\TriggerActionItem.cs" />
+    <Compile Include="TriggersTab\Triggers\TriggerActionItemFactory.cs" />
+    <Compile Include="TriggersTab\Triggers\TriggerItem.cs" />
+    <Compile Include="TriggersTab\Triggers\TriggerItemBase.cs" />
+    <Compile Include="TriggersTab\Triggers\TriggerItemFactory.cs" />
     <Compile Include="Shell\ShellConstants.cs" />
     <Compile Include="Shell\EmbeddedShellView.xaml.cs">
       <DependentUpon>EmbeddedShellView.xaml</DependentUpon>
@@ -266,6 +268,16 @@
     </Compile>
     <Compile Include="Xaml\XamlFormatter.cs" />
     <Compile Include="Xaml\XamlStyles.cs" />
+    <Compile Include="TriggersTab\TriggersView.xaml.cs">
+      <DependentUpon>TriggersView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\SettingsView.xaml.cs">
+      <DependentUpon>SettingsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="WindowInfo.cs" />
+    <Compile Include="WindowInfoControl.xaml.cs">
+      <DependentUpon>WindowInfoControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ZoomerControl.xaml.cs">
       <DependentUpon>ZoomerControl.xaml</DependentUpon>
     </Compile>
@@ -335,9 +347,6 @@
     </Compile>
     <Compile Include="SettingBindingExtension.cs" />
     <Compile Include="Settings.cs" />
-    <Compile Include="SnoopabilityFeedbackWindow.xaml.cs">
-      <DependentUpon>SnoopabilityFeedbackWindow.xaml</DependentUpon>
-    </Compile>
     <Compile Include="SnoopWindowUtils.cs" />
     <Compile Include="TrackballBehavior.cs" />
     <Compile Include="ValueEditors\BoolValueEditor.cs" />
@@ -380,41 +389,18 @@
     </Compile>
     <Compile Include="VisualTree3DView.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.VisualBasic.PowerPacks.10.0">
-      <Visible>False</Visible>
-      <ProductName>Microsoft Visual Basic PowerPacks 10.0</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
-      <Visible>False</Visible>
-      <ProductName>Windows Installer 3.1</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\SnoopCrosshairsCursor.cur" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\SnoopCrosshairsCursor.png" />
-  </ItemGroup>
-  <ItemGroup />
-  <ProjectExtensions>
-    <InteractiveDesigner>
-      <ProjectExtensions>
-        <Version>0.03</Version>
-      </ProjectExtensions>
-    </InteractiveDesigner>
-    <VisualStudio />
-  </ProjectExtensions>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And $(TargetFrameworkVersion) == 'v4.0'">
+      <ItemGroup>
+        <Reference Include="System.Management.Automation">
+          <HintPath>..\packages\Microsoft.PowerShell.3.ReferenceAssemblies\lib\net4\System.Management.Automation.dll</HintPath>
+          <Private>False</Private>
+          <SpecificVersion>False</SpecificVersion>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Import Project="..\.paket\paket.targets" />
 </Project>

@@ -4,6 +4,9 @@ bin/
 obj/
 Debug/
 Release/
+packages/
+paket-files/
+*.vs
 *.user
 *.opensdf
 *.sdf
@@ -11,4 +14,8 @@ Release/
 *.pdb
 *.dll
 *.ncb
-_Resharper.*
+
+# ReSharper is a .NET coding add-in
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user

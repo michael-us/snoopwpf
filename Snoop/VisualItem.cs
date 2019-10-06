@@ -16,7 +16,10 @@ using System.Windows.Data;
 
 namespace Snoop
 {
-	/// <summary>
+    using System.Linq;
+    using System.Windows.Interop;
+
+    /// <summary>
 	/// Main class that represents a visual in the visual tree
 	/// </summary>
 	public class VisualItem : ResourceContainerItem
@@ -65,12 +68,11 @@ namespace Snoop
 		{
 			get
 			{
-				VisualBrush brush = new VisualBrush(this.Visual);
+				VisualBrush brush = VisualCaptureUtil.CreateVisualBrushSafe(this.Visual);
 				brush.Stretch = Stretch.Uniform;
 				return brush;
 			}
 		}
-
 
 		protected override ResourceDictionary ResourceDictionary
 		{
@@ -120,6 +122,30 @@ namespace Snoop
 			// having the call to base.Reload here ... puts the application resources at the very top of the tree view.
 			// this used to be at the bottom. putting it here makes it consistent (and easier to use) with ApplicationTreeItem
 			base.Reload(toBeRemoved);
+
+		    var window = this.Visual as Window;
+ 
+		    if (window != null) 
+		    { 
+		        foreach (Window ownedWindow in window.OwnedWindows) 
+		        {
+		            if (ownedWindow.CheckAccess() == false)
+		            {
+                        continue;
+		            }
+
+		            // don't recreate existing items but reload them instead
+		            var existingItem = toBeRemoved.FirstOrDefault(x => ReferenceEquals(x.Target, ownedWindow));
+		            if (existingItem != null)
+		            {
+		                toBeRemoved.Remove(existingItem);
+		                existingItem.Reload();
+		                continue;
+		            }
+
+		            this.Children.Add(VisualTreeItem.Construct(ownedWindow, this)); 
+		        } 
+		    } 
 
 			// remove items that are no longer in tree, add new ones.
 			for (int i = 0; i < VisualTreeHelper.GetChildrenCount(this.Visual); i++)
