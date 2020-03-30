@@ -105,6 +105,9 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Xaml\XamlView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="TriggersTab\TriggersView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
